@@ -1,83 +1,89 @@
-import "./css/common.css";
+// Для повідомлень використана бібліотека
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+
+import NewsApiService from './js/fetchimages';
+
+import galleryCards from './templates/galleryCards.hbs';
 
 // Описаний в документації
 import SimpleLightbox from "simplelightbox";
 // Додатковий імпорт стилів
 import "simplelightbox/dist/simple-lightbox.min.css";
-// Для HTTP-запитів використана бібліотека
-import axios from "axios";
-// Для повідомлень використана бібліотека
-import { Notify } from 'notiflix/build/notiflix-notify-aio';
-
-import { fetchImagesNew, PER_PAGE } from './js/fetchimages';
 
 const refs = {
-    searchForm: document.querySelector('.js-search-form'),
-    articlesContainer: document.querySelector('.gallery'),
-    loadMoreBtn:document.querySelector('[data-action="load-more"]'),
+    searchForm: document.querySelector('.search-form'),
+    imgContainer: document.querySelector('.gallery'),
+    loadMoreBtn: document.querySelector('.load-more'),
   };
 
+  const newsApiService = new NewsApiService();
   
-refs.searchForm.addEventListener('submit', onSearch);
-loadMoreBtn.refs.button.addEventListener('click', onLoadMore);
- 
-function onSearch(e) {
+  refs.searchForm.addEventListener('submit', onSearch);
+  refs.loadMoreBtn.addEventListener('click', onLoadMore);
+  
+  function onSearch(e) {
     e.preventDefault();
   
-    newsApiService.query = e.currentTarget.elements.query.value;
+    newsApiService.query = e.currentTarget.elements.searchQuery.value.trim();
+    newsApiService.resetPage();
   
-    // if (newsApiService.query === '') {
-    //   return alert('Введи что-то нормальное');
-    // }
+    if (newsApiService.query === '') {
+      clearImgContainer();
+      refs.loadMoreBtn.classList.add('is-hidden');
+      return Notify.warning('Please, fill the main field');
+    }
   
-    // loadMoreBtn.show();
-    // newsApiService.resetPage();
-    // clearArticlesContainer();
-    // fetchArticles();
-  }
-  function onLoadMore () {
+    newsApiService
+    .fetchGalleryCards()
 
-  }
-//   function fetchArticles() {
-//     loadMoreBtn.disable();
-//     newsApiService.fetchArticles().then(articles => {
-//       appendArticlesMarkup(articles);
-//       loadMoreBtn.enable();
-//     });
-//   }
-  
-//   function appendArticlesMarkup(articles) {
-//     refs.articlesContainer.insertAdjacentHTML('beforeend', createImgCard(galleryItems));
-//   }
-  
-//   function clearArticlesContainer() {
-//     refs.gallery.innerHTML = '';
-//   }
+    .then(data => {
+      clearImgContainer();
+      refs.loadMoreBtn.classList.remove('is-hidden');
 
-//   function createImgCard(data, node) {
-//     const markup = data
-//       .map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => {
-//         return `
-//       <div class="photo-card">
-//       <img src="${webformatURL}" alt="${tags}" loading="lazy" />
-//       <div class="info">
-//       <p class="info-item">
-//       <b>${likes}</b>
-//       </p>
-//       <p class="info-item">
-//       <b>${views}</b>
-//       </p>
-//       <p class="info-item">
-//       <b>${comments}</b>
-//       </p>
-//       <p class="info-item">
-//       <b>${downloads}</b>
-//       </p>
-//       </div>
-//       </div>`;
-//       })
-//       .join("");
-//   }
-  
-//   node.insertAdjacentHTML('beforeend', markup);
-// };
+      if (!data.hits.length) {
+        Notify.warning(
+          `Sorry, there are no images matching your search query. Please try again.`,
+        );
+        refs.loadMoreBtn.classList.add('is-hidden');
+        return;
+      }
+
+      appendImgMarkup(data);
+      Notify.success(`Hooray! We found ${data.totalHits} images !!!`);
+    });
+}
+function onLoadMore() {
+  newsApiService.fetchGalleryCards().then(onScrollmake);
+}
+
+function appendImgMarkup(data) {
+  refs.imgContainer.insertAdjacentHTML('beforeend', galleryCards(data.hits));
+  onSliderMake();
+
+  const { height: cardHeight } = document
+  .querySelector('.gallery')
+  .firstElementChild.getBoundingClientRect();
+
+window.scrollBy({
+  top: cardHeight * 2,
+  behavior: 'smooth',
+});
+
+if (data.hits.length < 40 && data.hits.length > 0) {
+  refs.loadMoreBtn.classList.add('is-hidden');
+  Notify.info("We're sorry, but you've reached the end of search results.");
+}
+}
+   
+  function clearImgContainer() {
+    refs.imgContainer.innerHTML = '';
+  }
+
+  function onSliderMake() {
+    const lightbox = new SimpleLightbox('.gallery a', {
+      captions : true,
+      captionsData : 'alt',
+      captionDelay : 250,
+    });
+    lightbox.refresh();
+  }
