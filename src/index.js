@@ -59,7 +59,16 @@ function onLoadMore() {
 function appendImgMarkup(data) {
   refs.imgContainer.insertAdjacentHTML('beforeend', galleryCards(data.hits));
   onSliderMake();
+}
 
+function clearImgContainer() {
+  refs.imgContainer.innerHTML = '';
+}
+
+function onScrollmake(data) {
+  refs.imgContainer.insertAdjacentHTML('beforeend', galleryCards(data.hits));
+
+  onSliderMake();
   const { height: cardHeight } = document
   .querySelector('.gallery')
   .firstElementChild.getBoundingClientRect();
@@ -75,10 +84,6 @@ if (data.hits.length < 40 && data.hits.length > 0) {
 }
 }
    
-  function clearImgContainer() {
-    refs.imgContainer.innerHTML = '';
-  }
-
   function onSliderMake() {
     const lightbox = new SimpleLightbox('.gallery a', {
       captions : true,

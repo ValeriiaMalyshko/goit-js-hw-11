@@ -26,16 +26,16 @@ body {
   }
   form button {
     background-color: yellow;
-    width: 130px;
+    width: 120px;
     height: 30px;
-    border-radius: 3px;
+    border-radius: 5px;
     border: yellow;
     margin-left: 10px;
-    color: rgb(119, 126, 119);
+    color: black
   }
   form input {
-    width: 230px;
-    height: 27px;
+    width: 210px;
+    height: 30px;
     border-radius: 3px;
     border: greenyellow;
   }
@@ -80,11 +80,9 @@ body {
     grid-auto-columns: 290px;
     gap: 10px; 
     justify-content: space-around;
-  
     text-align: center;
     padding: 0 5px;
     font-size: 15px;
-    font-family: cursive;
   }
   
   .is-hidden {
