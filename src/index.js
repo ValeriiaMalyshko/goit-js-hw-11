@@ -1,4 +1,4 @@
-import "./styles.css"
+import './css/style.css';
 // Для повідомлень використана бібліотека
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
