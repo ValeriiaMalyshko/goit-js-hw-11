@@ -36,10 +36,14 @@ const refs = {
   
     newsApiService
     .fetchGalleryCards()
-
     .then(data => {
-      clearImgContainer();
+    clearImgContainer();
+    if (newsApiService.endOfHits) {
+      refs.loadMoreBtn.classList.add('is-hidden');
+    }
+    else {
       refs.loadMoreBtn.classList.remove('is-hidden');
+    }
 
       if (!data.hits.length) {
         Notify.warning(
@@ -51,6 +55,7 @@ const refs = {
 
       appendImgMarkup(data);
       Notify.success(`Hooray! We found ${data.totalHits} images !!!`);
+
     });
 }
 function onLoadMore() {
