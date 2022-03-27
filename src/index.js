@@ -52,6 +52,9 @@ const refs = {
         refs.loadMoreBtn.classList.add('is-hidden');
         return;
       }
+      if (data.hits.length < 40 && data.hits.length > 0) {
+        refs.loadMoreBtn.classList.add('is-hidden');
+      }
 
       appendImgMarkup(data);
       Notify.success(`Hooray! We found ${data.totalHits} images !!!`);
@@ -84,7 +87,7 @@ window.scrollBy({
   behavior: 'smooth',
 });
 
-if (data.hits.length < 40 && data.hits.length > 0) {
+if (data.totalHits === 0) {
   refs.loadMoreBtn.classList.add('is-hidden');
   Notify.info("We're sorry, but you've reached the end of search results.");
 }
