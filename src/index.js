@@ -18,6 +18,12 @@ const refs = {
   };
 
   const newsApiService = new NewsApiService();
+
+  const lightbox = new SimpleLightbox('.gallery a', {
+    captions : true,
+    captionsData : 'alt',
+    captionDelay : 250,
+  });
   
   refs.searchForm.addEventListener('submit', onSearch);
   refs.loadMoreBtn.addEventListener('click', onLoadMore);
@@ -38,6 +44,10 @@ const refs = {
     .fetchGalleryCards()
     .then(data => {
     clearImgContainer();
+    lightbox.refresh();
+
+    // refs.loadMoreBtn.classList.remove('is-hidden');
+
     if (newsApiService.endOfHits) {
       refs.loadMoreBtn.classList.add('is-hidden');
     }
@@ -54,12 +64,18 @@ const refs = {
       }
       if (data.hits.length < 40 && data.hits.length > 0) {
         refs.loadMoreBtn.classList.add('is-hidden');
+        // refs.loadMoreBtn.disabled = true;
       }
 
       appendImgMarkup(data);
       Notify.success(`Hooray! We found ${data.totalHits} images !!!`);
 
     });
+    // .catch(function(error) {console.error();})
+    // .finally (function() {
+    // refs.loadMoreBtn.classList.add('is-hidden');
+  //   refs.loadMoreBtn.disabled = true;
+  // });
 }
 function onLoadMore() {
   newsApiService.fetchGalleryCards().then(onScrollmake);
@@ -67,7 +83,8 @@ function onLoadMore() {
 
 function appendImgMarkup(data) {
   refs.imgContainer.insertAdjacentHTML('beforeend', galleryCards(data.hits));
-  onSliderMake();
+  // onSliderMake();
+  lightbox.refresh();
 }
 
 function clearImgContainer() {
@@ -76,8 +93,9 @@ function clearImgContainer() {
 
 function onScrollmake(data) {
   refs.imgContainer.insertAdjacentHTML('beforeend', galleryCards(data.hits));
+  // onSliderMake();
+  lightbox.refresh();
 
-  onSliderMake();
   const { height: cardHeight } = document
   .querySelector('.gallery')
   .firstElementChild.getBoundingClientRect();
@@ -93,11 +111,11 @@ if (data.totalHits === 0) {
 }
 }
    
-  function onSliderMake() {
-    const lightbox = new SimpleLightbox('.gallery a', {
-      captions : true,
-      captionsData : 'alt',
-      captionDelay : 250,
-    });
-    lightbox.refresh();
-  }
+  // function onSliderMake() {
+  //   const lightbox = new SimpleLightbox('.gallery a', {
+  //     captions : true,
+  //     captionsData : 'alt',
+  //     captionDelay : 250,
+  //   });
+  //   lightbox.refresh();
+  // }
